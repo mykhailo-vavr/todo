@@ -2,6 +2,7 @@ export const view = {
   todo: document.querySelector('.todo'),
   list: document.querySelector('.todo-list'),
   input: document.querySelector('.add-input'),
+  footer: document.querySelector('.todo-footer'),
   progressBarText: document.querySelector('.bar-text'),
   progressBarFiller: document.querySelector('.bar-filler'),
 
@@ -33,7 +34,6 @@ export const view = {
   makeItemDone({ target }) {
     let item = target.closest('.todo-list-item');
     let text = item.querySelector('.todo-text');
-    // item.classList.toggle('done-item');
     text.classList.toggle('done-text');
     this.changeProgressBar();
   },
@@ -56,6 +56,7 @@ export const view = {
     } else {
       text = `${countOfDoneTasks} of ${countOfTasks}`;
     }
+
     this.progressBarText.textContent = text;
   },
 
@@ -64,8 +65,6 @@ export const view = {
     if (!width) {
       width = 0;
     }
-    console.log(width);
-
     this.progressBarFiller.style.width = width + '%';
   },
 
@@ -82,23 +81,25 @@ export const view = {
     setTimeout(() => this.input.classList.remove('alert'), 200);
   },
 
-  removeItem({ target }) {
+  removeItem(target) {
     let item = target.closest('.todo-list-item');
-    item.remove();
-    this.changeProgressBar();
+    item.classList.add('item-before-remove');
+    setTimeout(() => {
+      item.remove();
+      this.changeProgressBar();
+    }, 900);
   },
 
   removeCompleted() {
     let items = document.querySelectorAll('.todo-list-item');
     for (const item of items) {
       if (item.querySelector('.done-text')) {
-        item.remove();
+        this.removeItem(item);
       }
     }
-    this.changeProgressBar();
   },
 
-  changeView({ target }) {
+  changeView(target) {
     let items = document.querySelectorAll('.todo-list-item');
     let show = target.dataset.show;
     this[show](items);
@@ -120,7 +121,11 @@ export const view = {
   showActive(items) {
     for (const item of items) {
       if (item.querySelector('.done-text')) {
-        item.style.display = 'none';
+        item.classList.add('item-before-remove');
+        setTimeout(() => {
+          item.style.display = 'none';
+          item.classList.remove('item-before-remove');
+        }, 900);
       } else {
         item.style.display = '';
       }
@@ -130,7 +135,11 @@ export const view = {
   showCompleted(items) {
     for (const item of items) {
       if (!item.querySelector('.done-text')) {
-        item.style.display = 'none';
+        item.classList.add('item-before-remove');
+        setTimeout(() => {
+          item.style.display = 'none';
+          item.classList.remove('item-before-remove');
+        }, 900);
       } else {
         item.style.display = '';
       }

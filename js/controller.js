@@ -6,7 +6,11 @@ export const controller = {
   },
 
   setListeners() {
-    view.todo.addEventListener('click', this.onClick);
+    view.list.addEventListener('click', this.onClick);
+    view.footer.addEventListener(
+      'click',
+      this.debounce(this.onClick)
+    );
     document.addEventListener('keydown', this.onKeydown);
   },
 
@@ -15,8 +19,20 @@ export const controller = {
     let action = elem?.dataset.action;
 
     if (action) {
-      view[action](event);
+      view[action](event.target);
     }
+  },
+
+  debounce(f) {
+    let isCooldown = false;
+    let cooldown = 900;
+
+    return function () {
+      if (isCooldown) return;
+      f.apply(this, arguments);
+      isCooldown = true;
+      setTimeout(() => (isCooldown = false), cooldown);
+    };
   },
 
   onKeydown({ code }) {

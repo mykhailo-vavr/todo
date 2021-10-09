@@ -88,6 +88,19 @@ body {
   }
 }
 
+.item-before-remove {
+  animation: item-disappearance 1s ease;
+}
+
+@keyframes item-disappearance {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
 .todo-list-item-container {
   display: flex;
   align-items: center;
@@ -107,10 +120,6 @@ body {
 
 .todo-list-item:hover .remove-button {
   visibility: visible;
-}
-
-.checkbox-container {
-  position: relative;
 }
 
 .todo-checker {
