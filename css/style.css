@@ -64,7 +64,6 @@ body {
   overflow-x: hidden;
   overflow-y: scroll;
   max-height: 228px;
-  padding-right: 0.5vw;
 }
 
 .todo-list::-webkit-scrollbar {
