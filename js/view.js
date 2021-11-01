@@ -1,10 +1,11 @@
 export const view = {
   todo: document.querySelector('.todo'),
   list: document.querySelector('.todo-list'),
-  input: document.querySelector('.add-input'),
+  input: document.querySelector('.add_input'),
   footer: document.querySelector('.todo-footer'),
-  progressBarText: document.querySelector('.bar-text'),
-  progressBarFiller: document.querySelector('.bar-filler'),
+  progressBarText: document.querySelector('.bar_text'),
+  progressBarFiller: document.querySelector('.bar_filler'),
+  animationTime: 900,
 
   createItem() {
     let text = this.getText();
@@ -19,22 +20,27 @@ export const view = {
         <input type="checkbox" class="todo-checker" />
         <span class="todo-text">${text}</span>
       </div>
-      <button class="remove-button" data-action="removeItem">
+      <button class="remove_btn" data-action="removeItem">
         <i class="fas fa-trash-alt"></i>
       </button>
     </li>`;
 
     this.list.insertAdjacentHTML('afterbegin', itemHtml);
-    let checkbox = document.querySelector('.todo-checker');
-    checkbox.addEventListener('change', this.makeItemDone.bind(this));
     this.changeProgressBar();
     this.clearText();
   },
 
-  makeItemDone({ target }) {
-    let item = target.closest('.todo-list-item');
-    let text = item.querySelector('.todo-text');
-    text.classList.toggle('done-text');
+  getText() {
+    return this.input.value;
+  },
+
+  clearText() {
+    this.input.value = '';
+  },
+
+  makeItemDone(target) {
+    let item = target.nextElementSibling;
+    item.classList.toggle('done_text');
     this.changeProgressBar();
   },
 
@@ -42,7 +48,7 @@ export const view = {
     let countOfTasks =
       document.querySelectorAll('.todo-list-item').length;
     let countOfDoneTasks =
-      document.querySelectorAll('.done-text').length;
+      document.querySelectorAll('.done_text').length;
     this.changeBarText(countOfTasks, countOfDoneTasks);
     this.changeBarFiller(countOfTasks, countOfDoneTasks);
   },
@@ -68,14 +74,6 @@ export const view = {
     this.progressBarFiller.style.width = width + '%';
   },
 
-  getText() {
-    return this.input.value;
-  },
-
-  clearText() {
-    this.input.value = '';
-  },
-
   remindAboutText() {
     this.input.classList.add('alert');
     setTimeout(() => this.input.classList.remove('alert'), 200);
@@ -83,66 +81,52 @@ export const view = {
 
   removeItem(target) {
     let item = target.closest('.todo-list-item');
-    item.classList.add('item-before-remove');
+    item.classList.add('item-before_remove');
     setTimeout(() => {
       item.remove();
       this.changeProgressBar();
-    }, 900);
+    }, this.animationTime);
   },
 
   removeCompleted() {
     let items = document.querySelectorAll('.todo-list-item');
     for (const item of items) {
-      if (item.querySelector('.done-text')) {
+      if (item.querySelector('.done_text')) {
         this.removeItem(item);
       }
     }
   },
 
   changeView(target) {
-    let items = document.querySelectorAll('.todo-list-item');
-    let show = target.dataset.show;
-    this[show](items);
+    let options = {
+      showAll: () => false,
+      showActive: item => item.querySelector('.done_text'),
+      showCompleted: item => !item.querySelector('.done_text')
+    };
+    let showOption = target.dataset.show;
+    this.show(options[showOption]);
     this.changeActiveBtn(target);
   },
 
+  show(rule) {
+    let items = document.querySelectorAll('.todo-list-item');
+
+    for (const item of items) {
+      if (rule(item)) {
+        item.classList.add('item-before_remove');
+        setTimeout(() => {
+          item.style.display = 'none';
+          item.classList.remove('item-before_remove');
+        }, this.animationTime);
+      } else {
+        item.style.display = '';
+      }
+    }
+  },
+
   changeActiveBtn(target) {
-    let currentBtn = document.querySelector('.active-btn');
-    currentBtn.classList.remove('active-btn');
-    target.classList.add('active-btn');
-  },
-
-  showAll(items) {
-    for (const item of items) {
-      item.style.display = '';
-    }
-  },
-
-  showActive(items) {
-    for (const item of items) {
-      if (item.querySelector('.done-text')) {
-        item.classList.add('item-before-remove');
-        setTimeout(() => {
-          item.style.display = 'none';
-          item.classList.remove('item-before-remove');
-        }, 900);
-      } else {
-        item.style.display = '';
-      }
-    }
-  },
-
-  showCompleted(items) {
-    for (const item of items) {
-      if (!item.querySelector('.done-text')) {
-        item.classList.add('item-before-remove');
-        setTimeout(() => {
-          item.style.display = 'none';
-          item.classList.remove('item-before-remove');
-        }, 900);
-      } else {
-        item.style.display = '';
-      }
-    }
+    let currentBtn = this.footer.querySelector('.active_btn');
+    currentBtn.classList.remove('active_btn');
+    target.classList.add('active_btn');
   }
 };

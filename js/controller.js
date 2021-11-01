@@ -12,20 +12,31 @@ export const controller = {
       this.debounce(this.onClick)
     );
     document.addEventListener('keydown', this.onKeydown);
+    view.list.addEventListener('change', this.onChange);
   },
 
-  onClick(event) {
-    let elem = event.target.closest('button[data-action]');
+  onClick({ target }) {
+    let elem = target.closest('button[data-action]');
     let action = elem?.dataset.action;
 
     if (action) {
-      view[action](event.target);
+      view[action](target);
     }
+  },
+
+  onKeydown({ code }) {
+    if (code === 'Enter') {
+      view.createItem();
+    }
+  },
+
+  onChange({ target }) {
+    view.makeItemDone.call(view, target);
   },
 
   debounce(f) {
     let isCooldown = false;
-    let cooldown = 900;
+    let cooldown = view.animationTime;
 
     return function () {
       if (isCooldown) return;
@@ -33,11 +44,5 @@ export const controller = {
       isCooldown = true;
       setTimeout(() => (isCooldown = false), cooldown);
     };
-  },
-
-  onKeydown({ code }) {
-    if (code == 'Enter') {
-      view.createItem();
-    }
   }
 };
